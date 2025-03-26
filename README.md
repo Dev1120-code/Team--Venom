@@ -56,7 +56,7 @@ A  Tetris Game implementation in C++ using console graphics.
 
 - 1 line: 10 points
 
-## Sample Photo
+## Sample Photo 
 
 ![Screenshot 2025-03-27 015843](https://github.com/user-attachments/assets/a0492671-22b2-42e7-8d8a-5b4cf2031504)
 
