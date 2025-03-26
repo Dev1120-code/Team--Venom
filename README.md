@@ -8,9 +8,9 @@ A  Tetris Game implementation in C++ using console graphics.
 - [Requirements](#Requirements)
 - [Installation](#Installation)
 - [Controls](#Controls)
-- [Game Mechanics](#GameMechanics)
-- [Scoring System](#ScoringSystem)
-- [Sample Photo](#SamplePhoto)
+- [Game Mechanics](#Game-Mechanics)
+- [Scoring System](#Scoring-System)
+- [Sample Photo](#Sample-Photo)
 
 
 ## Features
