@@ -1,5 +1,5 @@
-#include <iomanip>
 #include <bits/stdc++.h>
+#include <iomanip>
 #include <vector>
 #include <random>
 #include <conio.h>
@@ -15,6 +15,11 @@ void reset() { printf("\033[0m"); }
 int score = 0;
 int highscore = 0;
 const std::string HIGH_SCORE_FILE = "highscore.txt";
+
+const int GRID_WIDTH = 30;    
+const int GRID_HEIGHT = 20;   
+const int BLOCK_SIZE = 4; 
+
 
 void loadHighScore() {
     std::ifstream file(HIGH_SCORE_FILE);
@@ -56,21 +61,17 @@ struct Random
     std::uniform_int_distribution<int> mUniformDistribution;
 };
 
-std::vector<std::vector<int>> stage(22, std::vector<int>(13, 0));
-std::vector<std::vector<int>> block = 
-{ 
-    { 0, 0, 0, 0 },
-    { 0, 0, 0, 0 },
-    { 0, 0, 0, 0 },
-    { 0, 0, 0, 0 } 
-};
+std::vector<std::vector<int>> stage(GRID_HEIGHT + 2, std::vector<int>(GRID_WIDTH + 2, 0));
 
-std::vector<std::vector<int>> field(22, std::vector<int>(13, 0));
+std::vector<std::vector<int>> block = 
+{{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
+std::vector<std::vector<int>> field(GRID_HEIGHT + 2, std::vector<int>(GRID_WIDTH + 2, 0));
+
 // coordinate
 int y = 0; 
-int x = 4;
+int x = GRID_WIDTH/2 - BLOCK_SIZE/2; 
 bool gameover = false;
-size_t GAMESPEED = 20000; 
+size_t GAMESPEED = 7500; 
 
 Random getRandom{ 0, 6 };
 
@@ -79,9 +80,9 @@ std::vector<std::vector<std::vector<int>>> block_list =
     {{0,1,0,0},{0,1,0,0},{0,1,0,0},{0,1,0,}},
     {{0,0,0,0},{ 0,0,1,0},{0,0,1,0},{0,1,1,0}},
     {{0,0,0,0},{1,1,0,0},{0,1,1,0},{0,0,0,0}},
-    { {0,0,0,0},{0,1,1,0},{1,1,0,0},{0,0,0,0}},
-    { {0,0,0,0},{0,0,0,0},{1,1,1,0},{0,1,0,0}},
-    { {0,0,0,0},{0,1,1,0},{0,1,1,0},{0,0,0,0}},
+    {{0,0,0,0},{0,1,1,0},{1,1,0,0},{0,0,0,0}},
+    {{0,0,0,0},{0,0,0,0},{1,1,1,0},{0,1,0,0}},
+    {{0,0,0,0},{0,1,1,0},{0,1,1,0},{0,0,0,0}},
     {{0,0,0,0},{0,1,0,0},{0,1,0,0},{0,1,1,0}},
 };
 
@@ -116,32 +117,41 @@ int main()
     }
     return 0;
 }
+
 void checkfullrows()
 {
     int linescleared = 0;
-    for (size_t i = 0; i < 20; i++)
+    for (size_t i = 0; i < GRID_HEIGHT; i++)
     {
         bool full = true;
-        for (size_t j = 1; j < 11; j++)
+        for (size_t j = 1; j < GRID_WIDTH + 1; j++)
         {
             if (field[i][j] == 0)
             {
                 full = false;
+                break;
             }
         }
         if (full)
         {
             linescleared++;
-            for (size_t j = 1; j < 11; j++)
+            
+            for (size_t j = 1; j < GRID_WIDTH + 1; j++)
             {
                 field[i][j] = 0;
             }
+            
             for (size_t k = i; k > 0; k--)
             {
-                for (size_t j = 1; j < 11; j++)
+                for (size_t j = 1; j < GRID_WIDTH + 1; j++)
                 {
                     field[k][j] = field[k - 1][j];
                 }
+            }
+            
+            for (size_t j = 1; j < GRID_WIDTH + 1; j++)
+            {
+                field[0][j] = 0;
             }
         }
     }
@@ -229,7 +239,7 @@ void title()
     cout << "                      TEAM VENOM         ";
     cyan();
     cout << "\n";
-    cout << "\t*****************************************************\n\n";
+    cout << "\t***************************************************\n\n";
 
 
 
@@ -242,18 +252,16 @@ red();
     
     cout << "Choose >> ";
 }
-
 void display()
 {
     system("cls");
     yellow();
     std::cout << "Score: " << score << "\tHigh Score: " << highscore << std::endl;
 
-    for (size_t i = 0; i < 21; i++) 
+    for (size_t i = 0; i < GRID_HEIGHT + 1; i++)  // Changed from 21
     {
-        for (size_t j = 0; j < 12; j++) 
-        {
-            switch (field[i][j]) 
+        for (size_t j = 0; j < GRID_WIDTH + 2; j++)  // Changed from 12
+        {switch (field[i][j]) 
             {
                 case 0:
                 std::cout << " " << std::flush;
@@ -269,11 +277,11 @@ void display()
                 break;
             }
             
-        }
-        std::cout << std::endl;
+            
+        }std::cout << std::endl;
+    
     }
-
-   cyan();
+    cyan();
     std::cout<<"\nUSE LEFT ARROW TO MOVE LEFT\nUSE RIGHT ARROW TO MOVE RIGHT\nUP ARROW TO ROTATE BLOCK\nUSE DOWN ARROW TO SOFTDROP\nUSE SPACEBAR TO HARDDROP\nEscape TO Pause or Quit\n";
 
 
@@ -284,13 +292,15 @@ void display()
     }
 }
 
+
 void initGame()
 {
-    for (size_t i = 0; i <= 20; i++)
+    // Replace all numbers with GRID_WIDTH/HEIGHT
+    for (size_t i = 0; i <= GRID_HEIGHT; i++)  // Changed from 20
     {
-        for (size_t j = 0; j <= 11; j++)
+        for (size_t j = 0; j <= GRID_WIDTH + 1; j++)  // Changed from 11
         {
-            if ((j == 0) || (j == 11) || (i == 20)) 
+            if ((j == 0) || (j == GRID_WIDTH + 1) || (i == GRID_HEIGHT)) 
             {
                 field[i][j] = stage[i][j] = 9;
             }
@@ -300,43 +310,49 @@ void initGame()
             }
         }
     }
-
     makeBlocks();
-
     display();
 }
-
 bool makeBlocks()
 {
-    x = 4;
-    y = 0;
+    // 1. Set spawn position (centered horizontally)
+    x = GRID_WIDTH / 2 - 2;  // -2 because blocks are 4 units wide (BLOCK_SIZE=4)
+    y = 0;  // Always spawn at top
 
+    // 2. Get random block type (0-6)
     int blockType = getRandom();
 
-    for (size_t i = 0; i < 4; i++)
-    {
-        for (size_t j = 0; j < 4; j++)
-        {
+    // 3. Clear current block data
+    for (size_t i = 0; i < BLOCK_SIZE; i++) {
+        for (size_t j = 0; j < BLOCK_SIZE; j++) {
             block[i][j] = 0;
+            // Load shape from block_list
             block[i][j] = block_list[blockType][i][j];
         }
     }
 
-    for (size_t i = 0; i < 4; i++)
-    {
-        for (size_t j = 0; j < 4; j++)
-        {
-            field[i][j + 4] = stage[i][j + 4] + block[i][j];
-
-            if (field[i][j + 4] > 1)
+    // 4. Place block on field with boundary checks
+    for (size_t i = 0; i < BLOCK_SIZE; i++) {
+        for (size_t j = 0; j < BLOCK_SIZE; j++) {
+            // Only modify if within grid bounds
+            if (y + i < GRID_HEIGHT + 1 &&       // +1 for bottom wall
+                x + j < GRID_WIDTH + 2 &&        // +2 for side walls
+                block[i][j] != 0)                // Only place active blocks
             {
-                gameover = true;
-                return true;
+                field[y + i][x + j] = stage[y + i][x + j] + block[i][j];
+                
+                // Collision detection (block overlaps existing blocks)
+                if (field[y + i][x + j] > 1) {
+                    gameover = true;
+                    return true;  // Game over
+                }
             }
         }
     }
-    return false;
+    return false;  // Block placed successfully
 }
+
+
 
 void moveBlock(int x2, int y2)
 {
@@ -365,26 +381,44 @@ void moveBlock(int x2, int y2)
     display();
 }
 
+
 void collidable()
 {
-    for (size_t i = 0; i<21; i++)
+    for (size_t i = 0; i < GRID_HEIGHT + 1; i++)  // Changed from 21
     {
-        for (size_t j = 0; j<12; j++)
+        for (size_t j = 0; j < GRID_WIDTH + 2; j++)  // Changed from 12
         {
             stage[i][j] = field[i][j];
         }
     }
 }
 
+
 bool isCollide(int x2, int y2)
 {
-    for (size_t i = 0; i < 4; i++)
+    for (size_t i = 0; i < BLOCK_SIZE; i++)
     {
-        for (size_t j = 0; j < 4; j++)
+        for (size_t j = 0; j < BLOCK_SIZE; j++)
         {
-            if (block[i][j] && stage[y2 + i][x2 + j] != 0)
+            // Check if block cell is occupied
+            if (block[i][j]) 
             {
-                return true;
+                // Calculate position on grid
+                int gridX = x2 + j;
+                int gridY = y2 + i;
+                
+                // Boundary checks
+                if (gridX < 0 || gridX >= GRID_WIDTH + 2 || 
+                    gridY < 0 || gridY >= GRID_HEIGHT + 1)
+                {
+                    return true;  // Collision with walls
+                }
+                
+                // Collision with existing blocks
+                if (stage[gridY][gridX] != 0) 
+                {
+                    return true;
+                }
             }
         }
     }
@@ -437,6 +471,7 @@ bool rotateBolck()
     return false;
 }
 
+
 void spwanBlock()
 {
     if (!isCollide(x, y + 1))
@@ -445,9 +480,17 @@ void spwanBlock()
     }
     else
     {
-        collidable();
-        checkfullrows();
-        makeBlocks();
+        // Lock the piece only if it's at the bottom or colliding
+        if (y == 0 && isCollide(x, y)) 
+        {
+            gameover = true;
+        }
+        else
+        {
+            collidable();
+            checkfullrows();
+            makeBlocks();
+        }
         display();
     }
 }
@@ -478,6 +521,7 @@ void userInput()
         break;
     case 72: // Up arrow key
         rotateBolck();
+        
         break;
     case 32: // Spacebar
         while (!isCollide(x, y + 1))
