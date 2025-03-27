@@ -13,36 +13,18 @@ void blue() { printf("\033[1;34m"); }
 void orange() { printf("\033[38;2;255;140;0m"); }  
 void reset() { printf("\033[0m"); }
 int score = 0;
-int highscore = 0;
-const std::string HIGH_SCORE_FILE = "highscore.txt";
+
 
 const int GRID_WIDTH = 30;    
 const int GRID_HEIGHT = 20;   
 const int BLOCK_SIZE = 4; 
 
 
-void loadHighScore() {
-    std::ifstream file(HIGH_SCORE_FILE);
-    if (file.is_open()) {
-        file >> highscore;
-        file.close();
-    }
-}
 
-void saveHighScore() {
-    std::ofstream file(HIGH_SCORE_FILE);
-    if (file.is_open()) {
-        file << highscore;
-        file.close();
-    }
-}
 
 void updateScore(int linesCleared) {
     score += linesCleared * 10;
-    if (score > highscore) {
-        highscore = score;
-        saveHighScore();
-    }
+    
 }
 
 
@@ -214,10 +196,8 @@ int menu()
     switch (select_num)
     {
     case 1:
+
     case 2:
-    std::cout<<"High Score: "<<highscore<<std::endl;
-        return select_num;
-    case 3:
         break;
     default:
         select_num = 0;
@@ -245,18 +225,18 @@ void title()
 
 
     
-    cout << "MENU:\n";
-    cyan(); 
+    cout << "Menu:\n";
+    orange(); 
     cout << "1: Start Game\n";
 red();
     
-    cout << "Choose >> ";
+    cout << "Choose - ";
 }
 void display()
 {
     system("cls");
     yellow();
-    std::cout << "Score: " << score << "\tHigh Score: " << highscore << std::endl;
+    std::cout << "Score: " << score <<  std::endl;
 
     for (size_t i = 0; i < GRID_HEIGHT + 1; i++)  // Changed from 21
     {
